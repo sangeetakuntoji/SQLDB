@@ -1,30 +1,34 @@
-variable "resource_group_location" {
-  type        = string
-  description = "Location for all resources."
-  default     = "eastus"
+resource "azurerm_resource_group" "rg" {
+  name     = azurerm_resource_group.rg.name
+  location = azurerm_resource_group.rg.location
 }
 
-variable "resource_group_name_prefix" {
-  type        = string
-  description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
-  default     = "rg"
+
+
+resource "random_password" "admin_password" {
+  count       = var.admin_password == null ? 1 : 0
+  length      = 20
+  special     = true
+  min_numeric = 1
+  min_upper   = 1
+  min_lower   = 1
+  min_special = 1
 }
 
-variable "sql_db_name" {
-  type        = string
-  description = "The name of the SQL Database."
-  default     = "SampleDB"
+locals {
+  admin_password = try(random_password.admin_password[0].result, var.admin_password)
 }
 
-variable "admin_username" {
-  type        = string
-  description = "The administrator username of the SQL logical server."
-  default     = "azureadmin"
+resource "azurerm_mssql_server" "server" {
+  name                         = random_pet.azurerm_mssql_server_name.id
+  resource_group_name          = azurerm_resource_group.rg.name
+  location                     = azurerm_resource_group.rg.location
+  administrator_login          = var.admin_username
+  administrator_login_password = local.admin_password
+  version                      = "12.0"
 }
 
-variable "admin_password" {
-  type        = string
-  description = "The administrator password of the SQL logical server."
-  sensitive   = true
-  default     = null
+resource "azurerm_mssql_database" "db" {
+  name      = var.sql_db_name
+  server_id = azurerm_mssql_server.server.id
 }
