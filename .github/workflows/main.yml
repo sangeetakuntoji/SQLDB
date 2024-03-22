@@ -1,4 +1,4 @@
-name: 'Terraform_ACR-Appservice-Infra1'
+name: 'Terraform_SQLDB'
  
 on:
   push:
