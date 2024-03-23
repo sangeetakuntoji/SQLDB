@@ -1,40 +1,33 @@
-resource "random_pet" "rg_name" {
-  prefix = var.resource_group_name_prefix
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = random_pet.rg_name.id
-  location = var.resource_group_location
-}
-
-resource "random_pet" "azurerm_mssql_server_name" {
-  prefix = "sql"
-}
-
-resource "random_password" "admin_password" {
-  count       = var.admin_password == null ? 1 : 0
-  length      = 20
-  special     = true
-  min_numeric = 1
-  min_upper   = 1
-  min_lower   = 1
-  min_special = 1
-}
-
-locals {
-  admin_password = try(random_password.admin_password[0].result, var.admin_password)
-}
-
-resource "azurerm_mssql_server" "server" {
-  name                         = random_pet.azurerm_mssql_server_name.id
-  resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
-  administrator_login          = var.admin_username
-  administrator_login_password = local.admin_password
+resource "azurerm_sql_server" "example" {
+  name                         = "myexamplesqlserver"
+  resource_group_name          = azurerm_resource_group.example.name
+  location                     = azurerm_resource_group.example.location
   version                      = "12.0"
+  administrator_login          = "serveradmin"
+  administrator_login_password = "serverpassword"
+
+  tags = {
+    environment = "development"
+  }
 }
 
-resource "azurerm_mssql_database" "db" {
-  name      = var.sql_db_name
-  server_id = azurerm_mssql_server.server.id
+resource "azurerm_sql_database" "example" {
+  name                = "myexamplesqldatabase"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  server_name         = azurerm_sql_server.example.name
+
+  tags = {
+    environment = "development"
+  }
+
+  # prevent the possibility of accidental data loss
+  lifecycle {
+    prevent_destroy = true
+  }
 }
