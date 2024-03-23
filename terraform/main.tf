@@ -3,7 +3,7 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-resource "azurerm_sql_server" "example" {
+resource "azurerm_mssql_server" "example" {
   name                         = "myexamplesqlserver"
   resource_group_name          = azurerm_resource_group.example.name
   location                     = azurerm_resource_group.example.location
@@ -16,7 +16,7 @@ resource "azurerm_sql_server" "example" {
   }
 }
 
-resource "azurerm_sql_database" "example" {
+resource "azurerm_mssql_database" "example" {
   name                = "myexamplesqldatabase"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
