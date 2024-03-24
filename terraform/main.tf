@@ -21,7 +21,7 @@ resource "azurerm_app_service" "app-service" {
   resource_group_name = azurerm_resource_group.rg.name
   app_service_plan_id = azurerm_app_service_plan.plan.id
 }
- 
+
 resource "azurerm_sql_server" "sqldb" {
   name                         = "terraform-sqlserver"
   resource_group_name          = azurerm_resource_group.rg.name
