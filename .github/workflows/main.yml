@@ -1,4 +1,4 @@
-name: 'Terraform_SQLDB_updated'
+name: 'Terraform_SQLDB'
  
 on:
   push:
